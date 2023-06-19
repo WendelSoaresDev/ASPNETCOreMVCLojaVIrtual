@@ -7,16 +7,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using LojaVirtual.Models.Database;
 
 namespace LojaVirtual.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private LojaVirtualContext _banco;
+
+        public HomeController(LojaVirtualContext banco)
         {
-            return View();
+            _banco = banco;
         }
 
+        [HttpGet]
+        public IActionResult Index ()
+        {
+           return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index([FromForm]NewsletterEmail newsletter)
+        {
+            if (ModelState.IsValid)
+            {
+                //TODO - ADIÇÃO NO BANCO DE DADOS
+                _banco.NewsletterEmails.Add(newsletter);
+                _banco.SaveChanges();
+
+                TempData["MSG_S"] = "E-mail cadastrado! Agora você vai receber promoções especiais no seu e-mail! Fique atento às novidades!";
+
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return View();
+            }
+            
+        }
         public IActionResult Contato()
         {
 
